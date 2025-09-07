@@ -1,82 +1,99 @@
-Implementation.md
-  Project Overview
+# Implementation.md
 
-This project implements a backend-only Node.js case study for a Dashboard API.
+## Project Overview
+
+This project implements a **backend-only Node.js case study** for a Dashboard API.  
 It exposes two endpoints:
 
-Products Dashboard API – /dashboard/products
+- **Products Dashboard API** – `/dashboard/products`  
+- **Visitors Dashboard API** – `/dashboard/visitors`  
 
-Visitors Dashboard API – /dashboard/visitors
-
-The APIs support date range queries and bucket-based grouping (day, week, month).
-The backend is built with Express.js and tested using Postman.
+The APIs support **date range queries** and **bucket-based grouping** (`day`, `week`, `month`).  
+The backend is built with **Express.js** and tested using **Postman**.  
 No frontend is required.
 
-⚙️ Tech Stack
+---
 
-Node.js (v18+)
+## ⚙️ Tech Stack
 
-Express.js for HTTP server
+- Node.js (v18+)
+- Express.js for HTTP server
+- Day.js for date manipulation
+- Mock dataset for demo purposes (can be replaced with DB integration later)
 
-Day.js for date manipulation
+---
 
-Mock dataset for demo purposes ( replaced with DB integration later)
+## 📂 Project Structure
 
-
-📂 Project Structure
-dashboard-api/
-├── package.json
-├── server.js              # Express server & API routes
-├── utils/
-│   └── bucketUtils.js     # Utility for bucket-based grouping
-├── Implementation.md      
-├── .gitignore
+- dashboard-api/
+  - package.json
+  - server.js           
+  - utils/
+    - bucketUtils.js       # Utility for bucket-based grouping
+  - Implementation.md      
+  - .gitignore
 
 
-Products
+
+
+---
+
+## Sample Data
+
+**Products**
+```json
 [
   { "date": "2025-09-01", "added": 5, "removed": 2, "total": 120 },
   { "date": "2025-09-02", "added": 3, "removed": 0, "total": 123 },
   { "date": "2025-09-03", "added": 6, "removed": 1, "total": 128 }
 ]
-
+```
 
 Visitors
+
+```json
+
 [
   { "date": "2025-09-01", "visits": 50, "total": 50 },
   { "date": "2025-09-02", "visits": 75, "total": 125 },
   { "date": "2025-09-03", "visits": 40, "total": 165 }
-
 ]
+```
 
-tilities – bucketUtils.js
+🧰 Utilities – bucketUtils.js
 
 The utility file is responsible for grouping raw data into buckets (day, week, month).
 It uses Day.js with plugins (isoWeek, isSameOrAfter, isSameOrBefore) for date handling.
 
 🔧 How It Works
+
 Date Filtering
-If startDate is provided → keeps only records on/after that date.
-If endDate is provided → keeps only records on/before that date.
+- If startDate is provided → keeps only records on/after that date.
+- If endDate is provided → keeps only records on/before that date.
+
 Day Bucket
-Returns records one per day, with exact date as startDate and endDate.
+- Returns records one per day, with exact startDate and endDate.
+
 Week Bucket
-Groups all entries from the same ISO week.
-Calculates totals (added, removed, visits).
-Sets startDate to week start and endDate to week end.
+
+- Groups all entries from the same ISO week (Monday–Sunday).
+- Aggregates totals (added, removed, visits).
+- Sets startDate to week start and endDate to week end.
+
+
 Month Bucket
-Groups all entries from the same month.
-Aggregates totals and sets startDate/endDate to the first and last day of the month.
+
+- Groups all entries from the same calendar month.
+- Aggregates totals and sets startDate/endDate to the first and last day of the month.
 
 
+ Products Dashboard
 
-
-1. Products Dashboard
 Endpoint:
 GET /dashboard/products
 
 Sample Response (bucket=day):
-
+```json
 {
   "currentTotal": 128,
   "buckets": [
@@ -98,13 +115,17 @@ Sample Response (bucket=day):
 }
 
 
-2. Visitors Dashboard
+
+
+
+````
+ Visitors Dashboard
+
 Endpoint:
+
 GET /dashboard/visitors
-
-
 Sample Response (bucket=week):
-
+```json
 {
   "currentTotal": 165,
   "buckets": [
@@ -117,15 +138,19 @@ Sample Response (bucket=week):
   ]
 }
 
+
+
+```
+
 Bucket Logic
+- Implemented in utils/bucketUtils.js
+- Day bucket → groups per day
+- Week bucket → groups per week (Monday–Sunday)
+- Month bucket → groups per calendar month
+- Each bucket response includes startDate and endDate
 
-Implemented in utils/bucketUtils.js.
-Day bucket → groups per day.
-Week bucket → groups per week (Monday–Sunday).
-Month bucket → groups per calendar month.
-Each bucket response includes startDate and endDate.
-
-How to Run
+ 
+ How to Run
 
 Install dependencies:
 npm install
@@ -135,16 +160,37 @@ Start server:
 npm start
 
 
-Server will run at:
+Server URL:
 http://localhost:8000
 
-5. How to Test
-Use Postman or Browser:
+
+How to Test
+
 Products by day:
 GET http://localhost:8000/dashboard/products?bucket=day
 
-Visitors by week (with range):
+
+Visitors by week (with date range):
 GET http://localhost:8000/dashboard/visitors?bucket=week&startDate=2025-09-01&endDate=2025-09-07
+
 
 Products by month:
 GET http://localhost:8000/dashboard/products?bucket=month
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
